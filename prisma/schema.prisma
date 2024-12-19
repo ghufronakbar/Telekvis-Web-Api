@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  phone     String
+  email     String   @unique
+  password  String
+  picture   String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]
+}
+
+model Engineer {
+  id        String   @id @default(uuid())
+  name      String
+  field     String
+  phone     String
+  isDeleted Boolean  @default(false)
+  orders    Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id         String      @id @default(uuid())
+  userId     String
+  engineerId String?
+  location   String      @db.Text
+  latitude   Float
+  longitude  Float
+  brand      String
+  desc       String      @db.Text
+  picture    String?     @db.Text
+  status     OrderStatus
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id])
+  engineer Engineer? @relation(fields: [engineerId], references: [id])
+}
+
+enum OrderStatus {
+  Dipesan
+  Ditolak
+  Diterima
+  Proses
+  Selesai
+}
