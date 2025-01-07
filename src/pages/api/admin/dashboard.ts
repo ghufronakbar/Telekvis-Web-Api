@@ -11,8 +11,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       successOrders,
       rejectedOrders,
       totalUsers,
+      totalEngineers,
       totalMonthly,
-      totalWeekly,
       pendingOrdersData,
       chartData,
     ] = await Promise.all([
@@ -21,8 +21,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       countSuccessOrders(),
       countRejectedOrders(),
       countTotalUsers(),
+      countTotalEngineers(),
       getTotalIncomeMonthly(),
-      getTotalSevenDays(),
       getPendingOrders(),
       getChartData(),
     ]);
@@ -33,8 +33,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       successOrders,
       rejectedOrders,
       totalUsers,
+      totalEngineers,
       totalMonthly,
-      totalWeekly,
       pendingOrdersData,
       chartData,
     };
@@ -117,28 +117,12 @@ const getTotalIncomeMonthly = async () => {
   return total;
 };
 
-const getTotalSevenDays = async () => {
-  const now = new Date();
-  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const orders = await prisma.order.findMany({
+const countTotalEngineers = async () => {
+  return await prisma.engineer.count({
     where: {
-      AND: [
-        {
-          createdAt: {
-            gte: sevenDaysAgo,
-          },
-        },
-        {
-          status: $Enums.OrderStatus.Selesai,
-        },
-      ],
-    },
-    select: {
-      id: true,
+      isDeleted: false,
     },
   });
-  const total = orders.length;
-  return total;
 };
 
 const getChartData = async () => {

@@ -13,18 +13,28 @@ import {
   Tooltip,
   Legend,
   ChartData,
+  PointElement,
+  LineElement,
 } from "chart.js";
-import { Bar } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 import { Order, User } from "@prisma/client";
 import { GoListUnordered } from "react-icons/go";
 import { FaPerson, FaRegClock } from "react-icons/fa6";
 import { RxCross1 } from "react-icons/rx";
 import { BsCalendar2Month } from "react-icons/bs";
-import { TbCalendarMonth } from "react-icons/tb";
 import formatDate from "@/utils/format/formatDate";
 import Link from "next/link";
+import { MdEngineering } from "react-icons/md";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Tooltip,
+  Legend,
+  PointElement,
+  LineElement
+);
 
 interface ResDashboard {
   totalOrders: number;
@@ -33,7 +43,7 @@ interface ResDashboard {
   rejectedOrders: number;
   totalUsers: number;
   totalMonthly: number;
-  totalWeekly: number;
+  totalEngineers: number;
   pendingOrdersData: PendingOrdersData[];
   chartData: ResChartData[];
 }
@@ -107,9 +117,9 @@ const DashboardPage = () => {
           icon={<BsCalendar2Month className={cnIcon} />}
         />
         <GridItem
-          title="Total Pesanan Minggu Ini"
-          value={data?.totalWeekly}
-          icon={<TbCalendarMonth className={cnIcon} />}
+          title="Total Teknisi"
+          value={data?.totalEngineers}
+          icon={<MdEngineering className={cnIcon} />}
         />
         <GridItem
           title="Total Pengguna Aktif"
@@ -146,17 +156,17 @@ const GridChart = ({ chartData }: { chartData: ResChartData[] }) => {
   const labels = chartData.map((item) => item.month);
   const dataValues = chartData.map((item) => item.total);
 
-  const chartConfig: ChartData<"bar", number[], string> = {
+  const chartConfig: ChartData<"line", number[], string> = {
     labels,
     datasets: [
       {
         label: "Total Pesanan",
         data: dataValues,
-        backgroundColor: "#46C7B8",
+        backgroundColor: "rgba(70, 199, 184, 0.2)",
         borderColor: "#46C7B8",
-        borderWidth: 1,
-        borderRadius: 5,
-        borderSkipped: false,
+        borderWidth: 2,
+        tension: 0.4,
+        fill: true,
       },
     ],
   };
@@ -168,7 +178,7 @@ const GridChart = ({ chartData }: { chartData: ResChartData[] }) => {
           Pesanan Selesai Per Bulan
         </h1>
         <div className="text-black w-full h-full py-8">
-          <Bar
+          <Line
             data={chartConfig}
             style={{ width: "100%", height: "100%" }}
             options={{
